@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Cup 2026 Sweepstakes Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --stadium-dark: #0f172a;
+            --pitch-green: #10b981;
+            --pitch-dark: #059669;
+            --bg-soft: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --live-pulse: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-soft);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--stadium-dark), #1e293b);
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            border-bottom: 4px solid var(--pitch-green);
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.05em;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        /* Fixed Navigation / Filter Bar */
+        .nav-container {
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 15px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .nav-btn.active {
+            background-color: var(--pitch-green);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .person-section {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.04);
+            border: 1px solid #f1f5f9;
+        }
+
+        .person-name {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--stadium-dark);
+            margin-bottom: 12px;
+        }
+
+        .teams-badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .team-badge {
+            background-color: #f8fafc;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fixture-list {
+            list-style: none;
+        }
+
+        .fixture-item {
+            display: flex;
+            flex-direction: column;
+            padding: 14px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .fixture-item:last-child {
+            border-bottom: none;
+        }
+
+        .fixture-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .fixture-teams {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .vs-tag {
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .group-tag {
+            background-color: #edf2f7;
+            color: #4a5568;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .today-badge {
+            background-color: #fee2e2;
+            color: var(--live-pulse);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        @media (min-width: 650px) {
+            .fixture-item {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .fixture-meta {
+                flex-direction: row-reverse;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏆 2026 WORLD CUP</h1>
+        <p>Sweepstakes Group Hub • Head-to-Head Tracker (UK Time)</p>
+    </header>
+
+    <div class="nav-container">
+        <button class="nav-btn active" onclick="filterSelection('all')">Show All</button>
+        <button class="nav-btn" onclick="filterSelection('aaron')">Aaron</button>
+        <button class="nav-btn" onclick="filterSelection('dan')">Dan</button>
+        <button class="nav-btn" onclick="filterSelection('d')">D</button>
+        <button class="nav-btn" onclick="filterSelection('dawn')">Dawn</button>
+        <button class="nav-btn" onclick="filterSelection('jaz')">Jaz</button>
+        <button class="nav-btn" onclick="filterSelection('lynn')">Lynn</button>
+        <button class="nav-btn" onclick="filterSelection('noah')">Noah</button>
+        <button class="nav-btn" onclick="filterSelection('matt')">Matt</button>
+        <button class="nav-btn" onclick="filterSelection('simon')">Simon</button>
+        <button class="nav-btn" onclick="filterSelection('tara')">Tara</button>
+    </div>
+
+    <div class="container">
+
+        <section id="aaron" class="person-section">
+            <h2 class="person-name">Aaron</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇨🇦 Canada</span>
+                <span class="team-badge">🇺🇿 Uzbekistan</span>
+                <span class="team-badge">🇨🇭 Switzerland</span>
+                <span class="team-badge">🇲🇽 Mexico</span>
+                <span class="team-badge">🇨🇿 Czechia</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇲🇽 Mexico vs 🇿🇦 South Africa <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span class="today-badge">⚡ TONIGHT</span><span>Thu 11 June @ 20:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇰🇷 South Korea vs 🇨🇿 Czechia <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Fri 12 June @ 03:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇦 Canada vs 🇧🇦 Bosnia <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Fri 12 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇶🇦 Qatar vs 🇨🇭 Switzerland <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Sat 13 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇿 Uzbekistan vs 🇨🇴 Colombia <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Thu 18 June @ 02:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇿 Czechia vs 🇿🇦 South Africa <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Thu 18 June @ 17:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇭 Switzerland vs 🇧🇦 Bosnia <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Thu 18 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇦 Canada vs 🇶🇦 Qatar <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Thu 18 June @ 23:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇲🇽 Mexico vs 🇰🇷 South Korea <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Fri 19 June @ 02:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇹 Portugal vs 🇺🇿 Uzbekistan <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Tue 23 June @ 17:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇭 Switzerland vs 🇨🇦 Canada <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Wed 24 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇿 Czechia vs 🇲🇽 Mexico <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Thu 25 June @ 02:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇩 DR Congo vs 🇺🇿 Uzbekistan <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Sun 28 June @ 00:30</span><span class="group-tag">Group K</span></div></li>
+            </ul>
+        </section>
+
+        <section id="dan" class="person-section">
+            <h2 class="person-name">Dan</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇲🇦 Morocco</span>
+                <span class="team-badge">🇦🇹 Austria</span>
+                <span class="team-badge">🇧🇪 Belgium</span>
+                <span class="team-badge">🇨🇩 DR Congo</span>
+                <span class="team-badge">🇵🇦 Panama</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇧🇷 Brazil vs 🇲🇦 Morocco <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Sat 13 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇪 Belgium vs 🇪🇬 Egypt <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Mon 15 June @ 20:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇹 Austria vs 🇯🇴 Jordan <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Wed 17 June @ 05:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇹 Portugal vs 🇨🇩 DR Congo <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Wed 17 June @ 17:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇬🇭 Ghana vs 🇵🇦 Panama <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Thu 18 June @ 00:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇲🇦 Morocco <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Fri 19 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇪 Belgium vs 🇮🇷 Iran <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sun 21 June @ 20:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇷 Argentina vs 🇦🇹 Austria <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Mon 22 June @ 18:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇦 Panama vs 🇭🇷 Croatia <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Wed 24 June @ 00:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇴 Colombia vs 🇨🇩 DR Congo <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Wed 24 June @ 03:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇲🇦 Morocco vs 🇭🇹 Haiti <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Wed 24 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇿 New Zealand vs 🇧🇪 Belgium <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Sat 27 June @ 04:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇦 Panama vs 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sat 27 June @ 22:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇩 DR Congo vs 🇺🇿 Uzbekistan <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Sun 28 June @ 00:30</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇩🇿 Algeria vs 🇦🇹 Austria <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Sun 28 June @ 02:00</span><span class="group-tag">Group J</span></div></li>
+            </ul>
+        </section>
+
+        <section id="d" class="person-section">
+            <h2 class="person-name">D</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇨🇮 Cote d'Ivoire</span>
+                <span class="team-badge">🇮🇶 Iraq</span>
+                <span class="team-badge">🇫🇷 France</span>
+                <span class="team-badge">🇩🇪 Germany</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇩🇪 Germany vs 🇨🇼 Curacao <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sun 14 June @ 18:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇮 Cote d'Ivoire vs 🇪🇨 Ecuador <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Mon 15 June @ 00:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇫🇷 France vs 🇸🇳 Senegal <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Tue 16 June @ 20:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇮🇶 Iraq vs 🇳🇴 Norway <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Tue 16 June @ 23:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇩🇪 Germany vs 🇨🇮 Cote d'Ivoire <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Sat 20 June @ 21:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇫🇷 France vs 🇮🇶 Iraq <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Mon 22 June @ 22:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇨 Ecuador vs 🇩🇪 Germany <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Thu 25 June @ 21:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇼 Curacao vs 🇨🇮 Cote d'Ivoire <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Thu 25 June @ 21:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇴 Norway vs 🇫🇷 France <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Fri 26 June @ 20:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇸🇳 Senegal vs 🇮🇶 Iraq <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Fri 26 June @ 20:00</span><span class="group-tag">Group I</span></div></li>
+            </ul>
+        </section>
+
+        <section id="dawn" class="person-section">
+            <h2 class="person-name">Dawn</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇬🇭 Ghana</span>
+                <span class="team-badge">🇸🇦 Saudi Arabia</span>
+                <span class="team-badge">🇳🇿 New Zealand</span>
+                <span class="team-badge">🇳🇴 Norway</span>
+                <span class="team-badge">🇹🇳 Tunisia</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇸🇪 Sweden vs 🇹🇳 Tunisia <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Mon 15 June @ 03:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇸🇦 Saudi Arabia vs 🇺🇾 Uruguay <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Mon 15 June @ 23:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇮🇷 Iran vs 🇳🇿 New Zealand <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Tue 16 June @ 02:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇮🇶 Iraq vs 🇳🇴 Norway <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Tue 16 June @ 23:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇬🇭 Ghana vs 🇵🇦 Panama <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Thu 18 June @ 00:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇸 Spain vs 🇸🇦 Saudi Arabia <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sun 21 June @ 17:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇳 Tunisia vs 🇯🇵 Japan <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Sun 21 June @ 04:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇿 New Zealand vs 🇪🇬 Egypt <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Mon 22 June @ 02:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇴 Norway vs 🇸🇳 Senegal <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Tue 23 June @ 01:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇬🇭 Ghana <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Tue 23 June @ 21:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇳 Tunisia vs 🇳🇱 Netherlands <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Fri 26 June @ 00:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇴 Norway vs 🇫🇷 France <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Fri 26 June @ 20:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇻 Cape Verde vs 🇸🇦 Saudi Arabia <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sat 27 June @ 01:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇿 New Zealand vs 🇧🇪 Belgium <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Sat 27 June @ 04:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇭🇷 Croatia vs 🇬🇭 Ghana <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Sat 27 June @ 22:00</span><span class="group-tag">Group L</span></div></li>
+            </ul>
+        </section>
+
+        <section id="jaz" class="person-section">
+            <h2 class="person-name">Jaz</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇧🇦 Bosnia</span>
+                <span class="team-badge">🇺🇸 USA</span>
+                <span class="team-badge">🇯🇵 Japan</span>
+                <span class="team-badge">🇵🇹 Portugal</span>
+                <span class="team-badge">🇧🇷 Brazil</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇨🇦 Canada vs 🇧🇦 Bosnia <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Fri 12 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇸 USA vs 🇵🇾 Paraguay <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sat 13 June @ 02:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇷 Brazil vs 🇲🇦 Morocco <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Sat 13 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇱 Netherlands vs 🇯🇵 Japan <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Sun 14 June @ 21:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇹 Portugal vs 🇨🇩 DR Congo <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Wed 17 June @ 17:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇭 Switzerland vs 🇧🇦 Bosnia <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Thu 18 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇸 USA vs 🇦🇺 Australia <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Fri 19 June @ 20:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇷 Brazil vs 🇭🇹 Haiti <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sat 20 June @ 02:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇳 Tunisia vs 🇯🇵 Japan <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Sun 21 June @ 04:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇹 Portugal vs 🇺🇿 Uzbekistan <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Tue 23 June @ 17:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇦 Bosnia vs 🇶🇦 Qatar <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Wed 24 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇧🇷 Brazil <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Wed 24 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇯🇵 Japan vs 🇸🇪 Sweden <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Fri 26 June @ 00:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇷 Turkey vs 🇺🇸 USA <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Fri 26 June @ 03:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇴 Colombia vs 🇵🇹 Portugal <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sun 28 June @ 00:30</span><span class="group-tag">Group K</span></div></li>
+            </ul>
+        </section>
+
+        <section id="lynn" class="person-section">
+            <h2 class="person-name">Lynn</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇦🇷 Argentina</span>
+                <span class="team-badge">🇺🇾 Uruguay</span>
+                <span class="team-badge">🇵🇾 Paraguay</span>
+                <span class="team-badge">🇨🇼 Curacao</span>
+                <span class="team-badge">🇪🇸 Spain</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇺🇸 USA vs 🇵🇾 Paraguay <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Sat 13 June @ 02:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇩🇪 Germany vs 🇨🇼 Curacao <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Sun 14 June @ 18:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇸 Spain vs 🇨🇻 Cape Verde <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Mon 15 June @ 17:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇸🇦 Saudi Arabia vs 🇺🇾 Uruguay <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Mon 15 June @ 23:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇷 Argentina vs 🇩🇿 Algeria <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Wed 17 June @ 02:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇷 Turkey vs 🇵🇾 Paraguay <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Sat 20 June @ 05:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇨 Ecuador vs 🇨🇼 Curacao <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Sun 21 June @ 00:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇸 Spain vs 🇸🇦 Saudi Arabia <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Sun 21 June @ 17:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇾 Uruguay vs 🇨🇻 Cape Verde <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sun 21 June @ 23:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇷 Argentina vs 🇦🇹 Austria <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Mon 22 June @ 18:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇼 Curacao vs 🇨🇮 Cote d'Ivoire <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Thu 25 June @ 21:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇾 Paraguay vs 🇦🇺 Australia <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Fri 26 June @ 03:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇾 Uruguay vs 🇪🇸 Spain <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sat 27 June @ 01:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇯🇴 Jordan vs 🇦🇷 Argentina <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Sun 28 June @ 02:00</span><span class="group-tag">Group J</span></div></li>
+            </ul>
+        </section>
+
+        <section id="noah" class="person-section">
+            <h2 class="person-name">Noah</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇪🇨 Ecuador</span>
+                <span class="team-badge">🇸🇪 Sweden</span>
+                <span class="team-badge">🇯🇴 Jordan</span>
+                <span class="team-badge">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</span>
+                <span class="team-badge">🇹🇷 Turkey</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇭🇹 Haiti vs 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sun 14 June @ 02:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇺 Australia vs 🇹🇷 Turkey <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Sun 14 June @ 05:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇮 Cote d'Ivoire vs 🇪🇨 Ecuador <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Mon 15 June @ 00:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇸🇪 Sweden vs 🇹🇳 Tunisia <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Mon 15 June @ 03:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇹 Austria vs 🇯🇴 Jordan <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Wed 17 June @ 05:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇲🇦 Morocco <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Fri 19 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇷 Turkey vs 🇵🇾 Paraguay <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sat 20 June @ 05:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇱 Netherlands vs 🇸🇪 Sweden <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Sat 20 June @ 18:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇨 Ecuador vs 🇨🇼 Curacao <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sun 21 June @ 00:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇯🇴 Jordan vs 🇩🇿 Algeria <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Tue 23 June @ 04:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland vs 🇧🇷 Brazil <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Wed 24 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇨 Ecuador vs 🇩🇪 Germany <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Thu 25 June @ 21:00</span><span class="group-tag">Group E</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇯🇵 Japan vs 🇸🇪 Sweden <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Fri 26 June @ 00:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇷 Turkey vs 🇺🇸 USA <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Fri 26 June @ 03:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇯🇴 Jordan vs 🇦🇷 Argentina <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sun 28 June @ 02:00</span><span class="group-tag">Group J</span></div></li>
+            </ul>
+        </section>
+
+        <section id="matt" class="person-section">
+            <h2 class="person-name">Matt</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇸🇳 Senegal</span>
+                <span class="team-badge">🇩🇿 Algeria</span>
+                <span class="team-badge">🇰🇷 South Korea</span>
+                <span class="team-badge">🇶🇦 Qatar</span>
+                <span class="team-badge">🇭🇷 Croatia</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇰🇷 South Korea vs 🇨🇿 Czechia <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Fri 12 June @ 03:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇶🇦 Qatar vs 🇨🇭 Switzerland <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Sat 13 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇫🇷 France vs 🇸🇳 Senegal <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Tue 16 June @ 20:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇷 Argentina vs 🇩🇿 Algeria <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Wed 17 June @ 02:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇭🇷 Croatia <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Wed 17 June @ 20:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇦 Canada vs 🇶🇦 Qatar <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Thu 18 June @ 23:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇲🇽 Mexico vs 🇰🇷 South Korea <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Fri 19 June @ 02:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇴 Norway vs 🇸🇳 Senegal <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Tue 23 June @ 01:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇯🇴 Jordan vs 🇩🇿 Algeria <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Tue 23 June @ 04:00</span><span class="group-tag">Group J</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇦 Panama vs 🇭🇷 Croatia <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Wed 24 June @ 00:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇦 Bosnia vs 🇶🇦 Qatar <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Wed 24 June @ 20:00</span><span class="group-tag">Group B</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇿🇦 South Africa vs 🇰🇷 South Korea <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Thu 25 June @ 02:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇸🇳 Senegal vs 🇮🇶 Iraq <span class="vs-tag">(D)</span></div><div class="fixture-meta"><span>Fri 26 June @ 20:00</span><span class="group-tag">Group I</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇭🇷 Croatia vs 🇬🇭 Ghana <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Sat 27 June @ 22:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇩🇿 Algeria vs 🇦🇹 Austria <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Sun 28 June @ 02:00</span><span class="group-tag">Group J</span></div></li>
+            </ul>
+        </section>
+
+        <section id="simon" class="person-section">
+            <h2 class="person-name">Simon</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇪🇬 Egypt</span>
+                <span class="team-badge">🇳🇱 Netherlands</span>
+                <span class="team-badge">🇦🇺 Australia</span>
+                <span class="team-badge">🇿🇦 South Africa</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇲🇽 Mexico vs 🇿🇦 South Africa <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span class="today-badge">⚡ TONIGHT</span><span>Thu 11 June @ 20:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇦🇺 Australia vs 🇹🇷 Turkey <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Sun 14 June @ 05:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇱 Netherlands vs 🇯🇵 Japan <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Sun 14 June @ 21:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇪 Belgium vs 🇪🇬 Egypt <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Mon 15 June @ 20:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇿 Czechia vs 🇿🇦 South Africa <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Thu 18 June @ 17:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇸 USA vs 🇦🇺 Australia <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Fri 19 June @ 20:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇱 Netherlands vs 🇸🇪 Sweden <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Sat 20 June @ 18:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇳🇿 New Zealand vs 🇪🇬 Egypt <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Mon 22 June @ 02:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇿🇦 South Africa vs 🇰🇷 South Korea <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Thu 25 June @ 02:00</span><span class="group-tag">Group A</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇹🇳 Tunisia vs 🇳🇱 Netherlands <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Fri 26 June @ 00:00</span><span class="group-tag">Group F</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇾 Paraguay vs 🇦🇺 Australia <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Fri 26 June @ 03:00</span><span class="group-tag">Group D</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇬 Egypt vs 🇮🇷 Iran <span class="vs-tag">(Tara)</span></div><div class="fixture-meta"><span>Sat 27 June @ 04:00</span><span class="group-tag">Group G</span></div></li>
+            </ul>
+        </section>
+
+        <section id="tara" class="person-section">
+            <h2 class="person-name">Tara</h2>
+            <div class="teams-badge-container">
+                <span class="team-badge">🇮🇷 Iran</span>
+                <span class="team-badge">🇨🇻 Cape Verde</span>
+                <span class="team-badge">🇨🇴 Colombia</span>
+                <span class="team-badge">🇭🇹 Haiti</span>
+                <span class="team-badge">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</span>
+            </div>
+            <ul class="fixture-list">
+                <li class="fixture-item"><div class="fixture-teams">🇭🇹 Haiti vs 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland <span class="vs-tag">(Noah)</span></div><div class="fixture-meta"><span>Sun 14 June @ 02:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇸 Spain vs 🇨🇻 Cape Verde <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Mon 15 June @ 17:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇮🇷 Iran vs 🇳🇿 New Zealand <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Tue 16 June @ 02:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇭🇷 Croatia <span class="vs-tag">(Matt)</span></div><div class="fixture-meta"><span>Wed 17 June @ 20:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇿 Uzbekistan vs 🇨🇴 Colombia <span class="vs-tag">(Aaron)</span></div><div class="fixture-meta"><span>Thu 18 June @ 02:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇷 Brazil vs 🇭🇹 Haiti <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Sat 20 June @ 02:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇧🇪 Belgium vs 🇮🇷 Iran <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Sun 21 June @ 20:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇺🇾 Uruguay vs 🇨🇻 Cape Verde <span class="vs-tag">(Lynn)</span></div><div class="fixture-meta"><span>Sun 21 June @ 23:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England vs 🇬🇭 Ghana <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Tue 23 June @ 21:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇴 Colombia vs 🇨🇩 DR Congo <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Wed 24 June @ 03:00</span><span class="group-tag">Group K</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇲🇦 Morocco vs 🇭🇹 Haiti <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Wed 24 June @ 23:00</span><span class="group-tag">Group C</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇻 Cape Verde vs 🇸🇦 Saudi Arabia <span class="vs-tag">(Dawn)</span></div><div class="fixture-meta"><span>Sat 27 June @ 01:00</span><span class="group-tag">Group H</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇪🇬 Egypt vs 🇮🇷 Iran <span class="vs-tag">(Simon)</span></div><div class="fixture-meta"><span>Sat 27 June @ 04:00</span><span class="group-tag">Group G</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇵🇦 Panama vs 🏴󠁧󠁢󠁥󠁮󠁧󠁿 England <span class="vs-tag">(Dan)</span></div><div class="fixture-meta"><span>Sat 27 June @ 22:00</span><span class="group-tag">Group L</span></div></li>
+                <li class="fixture-item"><div class="fixture-teams">🇨🇴 Colombia vs 🇵🇹 Portugal <span class="vs-tag">(Jaz)</span></div><div class="fixture-meta"><span>Sun 28 June @ 00:30</span><span class="group-tag">Group K</span></div></li>
+            </ul>
+        </section>
+
+    </div>
+
+    <script>
+        function filterSelection(id) {
+            var sections = document.getElementsByClassName("person-section");
+            var buttons = document.getElementsByClassName("nav-btn");
+            
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+                if (buttons[i].getAttribute("onclick").includes(id)) {
+                    buttons[i].classList.add("active");
+                }
+            }
+
+            for (var i = 0; i < sections.length; i++) {
+                if (id === "all") {
+                    sections[i].style.display = "block";
+                } else {
+                    if (sections[i].id === id) {
+                        sections[i].style.display = "block";
+                    } else {
+                        sections[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
